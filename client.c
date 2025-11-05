@@ -47,16 +47,22 @@ int main(int argc, char **argv)
 {
     int pid;
     char *binary_to_send;
+    char *p;
+
     if (argc != 3)
         return (1);
     pid = ft_atoi(argv[1]);
     binary_to_send = str_to_bin(argv[2]);
-    while (*binary_to_send)
+    p = binary_to_send;
+    while (*p)
     {
-
-        binary_to_send++;
+        if (*p == '1')
+            kill(pid, SIGUSR1);
+        else
+            kill(pid, SIGUSR2);
+        usleep(100);
+        p++;
     }
-
     free(binary_to_send);
     return (0);
 }

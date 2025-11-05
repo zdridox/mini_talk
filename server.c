@@ -42,6 +42,8 @@ void signal_handler(int sig)
         c = '0';
     bin[size] = c;
     bin[size + 1] = '\0';
+    if (ft_strlen(bin) == 8)
+        print_ascii();
 }
 
 int main()
@@ -54,6 +56,7 @@ int main()
     signal(SIGUSR2, signal_handler);
     while (1)
     {
+        pause();
     }
     return (0);
 }
