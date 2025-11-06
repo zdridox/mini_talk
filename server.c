@@ -33,8 +33,6 @@ void signal_handler(int sig)
     int size;
     char c;
 
-    if (ft_strlen(bin) == 8)
-        print_ascii();
     size = ft_strlen(bin);
     if (sig == SIGUSR1)
         c = '1';
@@ -56,7 +54,7 @@ int main()
     signal(SIGUSR2, signal_handler);
     while (1)
     {
-        pause();
+        //pause();
     }
     return (0);
 }

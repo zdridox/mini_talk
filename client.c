@@ -60,7 +60,7 @@ int main(int argc, char **argv)
             kill(pid, SIGUSR1);
         else
             kill(pid, SIGUSR2);
-        usleep(100);
+        usleep(50);
         p++;
     }
     free(binary_to_send);
