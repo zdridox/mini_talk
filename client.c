@@ -1,68 +1,56 @@
-#include <unistd.h>
-#include <signal.h>
-#include "libft.h"
+#include "so_long.h"
 
-char *char_to_bin(char c)
+t_data *data;
+
+void free_data()
 {
-    int i;
-    char *out;
-
-    out = malloc(9);
-    if (!out)
-        return (NULL);
-    i = 7;
-    while (i >= 0)
-    {
-        if ((c >> i) & 1)
-            out[7 - i] = '1';
-        else
-            out[7 - i] = '0';
-        i--;
-    }
-    return (out[8] = '\0', out);
+    free(data->message);
+    free(data);
+    exit(0);
 }
 
-char *str_to_bin(char *str)
+void send_bit()
 {
-    char *res;
-    char *bin_char;
-    int buff_size;
-
-    buff_size = (ft_strlen(str) * 8) + 1;
-    res = malloc(buff_size);
-    if (!res)
-        return (NULL);
-    res[0] = '\0';
-    while (*str)
+    if ((data->buffer >> (7 - data->buffer_size)) & 1)
+        kill(data->pid, SIGUSR1);
+    else
+        kill(data->pid, SIGUSR2);
+    data->buffer_size++;
+    if (data->buffer_size == 8)
     {
-        bin_char = char_to_bin(*str);
-        ft_strlcat(res, bin_char, buff_size);
-        free(bin_char);
-        str++;
+        data->buffer = *(++data->p);
+        data->buffer_size = 0;
+        data->bytes_send++;
+        if (!data->buffer)
+            free_data();
     }
-    return (res);
+}
+
+void signal_handler(int sig)
+{
+    if (sig == SIGUSR1)
+    {
+        // ft_printf("\rbytes sent: %d/%d", data->bytes_send, data->bytes_size);
+        send_bit();
+    }
 }
 
 int main(int argc, char **argv)
 {
-    int pid;
-    char *binary_to_send;
-    char *p;
-
     if (argc != 3)
         return (1);
-    pid = ft_atoi(argv[1]);
-    binary_to_send = str_to_bin(argv[2]);
-    p = binary_to_send;
-    while (*p)
+    data = malloc(sizeof(t_data));
+    data->pid = ft_atoi(argv[1]);
+    data->message = ft_strdup(argv[2]);
+    data->p = data->message;
+    data->buffer = *data->p;
+    data->bytes_size = (int)ft_strlen(data->message);
+    data->bytes_send = 0;
+    signal(SIGUSR1, signal_handler);
+    send_bit();
+    while (1)
     {
-        if (*p == '1')
-            kill(pid, SIGUSR1);
-        else
-            kill(pid, SIGUSR2);
-        usleep(100);
-        p++;
+        ft_printf("\rbytes sent: %d/%d", data->bytes_send, data->bytes_size);
     }
-    free(binary_to_send);
     return (0);
 }

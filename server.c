@@ -1,59 +1,48 @@
-#include <unistd.h>
-#include <signal.h>
-#include "libft.h"
+#include "so_long.h"
 
-char bin[9];
+t_buffer *buffer;
 
-int binary_to_ascii(char *binary)
+void signal_handler(int sig, siginfo_t *info, void *context)
 {
-    int i;
-    int value;
+    int client_pid;
 
-    i = 0;
-    value = 0;
-    while (i < 8)
-    {
-        value = value * 2 + (binary[i] - '0');
-        i++;
-    }
-    return (value);
-}
-
-void print_ascii()
-{
-    char c;
-
-    c = (char)binary_to_ascii(bin);
-    write(1, &c, 1);
-    bin[0] = '\0';
-}
-
-void signal_handler(int sig)
-{
-    int size;
-    char c;
-
-    if (ft_strlen(bin) == 8)
-        print_ascii();
-    size = ft_strlen(bin);
+    (void)context;
+    client_pid = info->si_pid;
+    buffer->size++;
     if (sig == SIGUSR1)
-        c = '1';
-    else
-        c = '0';
-    bin[size] = c;
-    bin[size + 1] = '\0';
-    if (ft_strlen(bin) == 8)
-        print_ascii();
+    {
+        buffer->buffer = (buffer->buffer << 1) | 1;
+    }
+    else if (sig == SIGUSR2)
+    {
+        buffer->buffer = (buffer->buffer << 1) | 0;
+    }
+    if (buffer->size == 8)
+    {
+        write(1, &buffer->buffer, 1);
+        buffer->buffer = 0;
+        buffer->size = 0;
+    }
+    kill(client_pid, SIGUSR1);
 }
 
 int main()
 {
     int pid;
+    struct sigaction sa;
 
+    buffer = malloc(sizeof(t_buffer));
+    buffer->buffer = 0;
+    buffer->size = 0;
     pid = getpid();
     ft_printf("pid: %d\n", pid);
-    signal(SIGUSR1, signal_handler);
-    signal(SIGUSR2, signal_handler);
+
+    sa.sa_sigaction = signal_handler;
+    sa.sa_flags = SA_SIGINFO;
+    sigemptyset(&sa.sa_mask);
+    sigaction(SIGUSR1, &sa, NULL);
+    sigaction(SIGUSR2, &sa, NULL);
+
     while (1)
     {
         pause();
