@@ -4,6 +4,7 @@ t_data *data;
 
 void free_data()
 {
+    ft_printf("\r%d%% | bytes: %d/%d\n", (data->bytes_send * 100) / data->bytes_size, data->bytes_send, data->bytes_size);
     free(data->message);
     free(data);
     exit(0);
@@ -50,7 +51,7 @@ int main(int argc, char **argv)
     send_bit();
     while (1)
     {
-        ft_printf("\rbytes sent: %d/%d", data->bytes_send, data->bytes_size);
+        ft_printf("\r%d%% | bytes: %d/%d", (data->bytes_send * 100) / data->bytes_size, data->bytes_send, data->bytes_size);
     }
     return (0);
 }
