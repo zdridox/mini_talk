@@ -6,7 +6,7 @@
 /*   By: mzdrodow <mzdrodow@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/28 20:28:20 by mzdrodow          #+#    #+#             */
-/*   Updated: 2025/11/28 20:28:20 by mzdrodow         ###   ########.fr       */
+/*   Updated: 2025/11/29 01:43:47 by mzdrodow         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,7 +20,6 @@ typedef struct s_buffer
 {
 	char					buffer;
 	int						size;
-	volatile sig_atomic_t	terminate;
 }							t_buffer;
 
 typedef struct s_data

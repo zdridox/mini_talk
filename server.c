@@ -6,13 +6,13 @@
 /*   By: mzdrodow <mzdrodow@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/28 20:28:11 by mzdrodow          #+#    #+#             */
-/*   Updated: 2025/11/28 20:28:11 by mzdrodow         ###   ########.fr       */
+/*   Updated: 2025/11/29 01:44:54 by mzdrodow         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "mini_talk.h"
 
-t_buffer	*g_buffer;
+t_buffer	g_buffer;
 
 void	signal_handler(int sig, siginfo_t *info, void *context)
 {
@@ -20,28 +20,22 @@ void	signal_handler(int sig, siginfo_t *info, void *context)
 
 	(void)context;
 	client_pid = info->si_pid;
-	g_buffer->size++;
+	g_buffer.size++;
 	if (sig == SIGUSR1)
 	{
-		g_buffer->buffer = (g_buffer->buffer << 1) | 1;
+		g_buffer.buffer = (g_buffer.buffer << 1) | 1;
 	}
 	else if (sig == SIGUSR2)
 	{
-		g_buffer->buffer = (g_buffer->buffer << 1) | 0;
+		g_buffer.buffer = (g_buffer.buffer << 1) | 0;
 	}
-	if (g_buffer->size == 8)
+	if (g_buffer.size == 8)
 	{
-		write(1, &g_buffer->buffer, 1);
-		g_buffer->buffer = 0;
-		g_buffer->size = 0;
+		write(1, &g_buffer.buffer, 1);
+		g_buffer.buffer = 0;
+		g_buffer.size = 0;
 	}
 	kill(client_pid, SIGUSR1);
-}
-
-void	ctrlc_handler(int sig)
-{
-	(void)sig;
-	g_buffer->terminate = 1;
 }
 
 int	main(void)
@@ -49,9 +43,8 @@ int	main(void)
 	int					pid;
 	struct sigaction	sa;
 
-	g_buffer = malloc(sizeof(t_buffer));
-	g_buffer->buffer = 0;
-	g_buffer->size = 0;
+	g_buffer.buffer = 0;
+	g_buffer.size = 0;
 	pid = getpid();
 	ft_printf("pid: %d\n", pid);
 	sa.sa_sigaction = signal_handler;
@@ -59,15 +52,8 @@ int	main(void)
 	sigemptyset(&sa.sa_mask);
 	sigaction(SIGUSR1, &sa, NULL);
 	sigaction(SIGUSR2, &sa, NULL);
-	signal(SIGINT, ctrlc_handler);
-	g_buffer->terminate = 0;
 	while (1)
 	{
-		if (g_buffer->terminate)
-		{
-			free(g_buffer);
-			exit(0);
-		}
 		pause();
 	}
 	return (0);
