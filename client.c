@@ -6,7 +6,7 @@
 /*   By: mzdrodow <mzdrodow@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/28 20:28:07 by mzdrodow          #+#    #+#             */
-/*   Updated: 2025/11/29 01:51:14 by mzdrodow         ###   ########.fr       */
+/*   Updated: 2025/11/29 02:22:23 by mzdrodow         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,10 +14,36 @@
 
 t_data	*g_data;
 
+char	*progress_bar(void)
+{
+	char	*bar;
+	int		progress;
+	int		i;
+	int		j;
+
+	i = 0;
+	j = 0;
+	bar = malloc(13);
+	progress = ((g_data->bytes_send * 100) / g_data->bytes_size) / 10;
+	bar[j++] = '[';
+	while (i++ < progress)
+		bar[j++] = '#';
+	i = 0;
+	while (i++ < 10 - progress)
+		bar[j++] = '-';
+	bar[11] = ']';
+	bar[12] = '\0';
+	return (bar);
+}
+
 void	free_data(void)
 {
-	ft_printf("\r%d%% | bytes: %d/%d\n", (g_data->bytes_send * 100)
-		/ g_data->bytes_size, g_data->bytes_send, g_data->bytes_size);
+	char	*bar;
+
+	bar = progress_bar();
+	ft_printf("\r%d%% %s | bytes: %d/%d", (g_data->bytes_send * 100)
+		/ g_data->bytes_size, bar, g_data->bytes_send, g_data->bytes_size);
+	free(bar);
 	free(g_data->message);
 	free(g_data);
 	exit(0);
@@ -51,9 +77,9 @@ void	signal_handler(int sig)
 
 int	main(int argc, char **argv)
 {
-	if (argc != 3)
-		return (1);
-	if (!*argv[2])
+	char	*bar;
+
+	if (argc != 3 || !*argv[2])
 		return (1);
 	g_data = malloc(sizeof(t_data));
 	g_data->pid = ft_atoi(argv[1]);
@@ -68,8 +94,10 @@ int	main(int argc, char **argv)
 	send_bit();
 	while (1)
 	{
-		ft_printf("\r%d%% | bytes: %d/%d", (g_data->bytes_send * 100)
-			/ g_data->bytes_size, g_data->bytes_send, g_data->bytes_size);
+		bar = progress_bar();
+		ft_printf("\r%d%% %s | bytes: %d/%d", (g_data->bytes_send * 100)
+			/ g_data->bytes_size, bar, g_data->bytes_send, g_data->bytes_size);
+		free(bar);
 		if (g_data->finished)
 			free_data();
 	}

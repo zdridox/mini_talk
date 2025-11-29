@@ -4,7 +4,7 @@ CLIENT = client
 
 # Compiler and flags
 CC = cc
-CFLAGS = -Wall -Wextra -Werror
+CFLAGS = -Wall -Wextra -Werror -g
 
 # Libft
 LIBFT_DIR = libft
