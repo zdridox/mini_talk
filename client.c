@@ -6,7 +6,7 @@
 /*   By: mzdrodow <mzdrodow@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/28 20:28:07 by mzdrodow          #+#    #+#             */
-/*   Updated: 2025/11/28 20:28:08 by mzdrodow         ###   ########.fr       */
+/*   Updated: 2025/11/29 01:51:14 by mzdrodow         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -52,6 +52,8 @@ void	signal_handler(int sig)
 int	main(int argc, char **argv)
 {
 	if (argc != 3)
+		return (1);
+	if (!*argv[2])
 		return (1);
 	g_data = malloc(sizeof(t_data));
 	g_data->pid = ft_atoi(argv[1]);
