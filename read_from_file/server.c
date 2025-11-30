@@ -6,7 +6,7 @@
 /*   By: mzdrodow <mzdrodow@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/28 20:28:11 by mzdrodow          #+#    #+#             */
-/*   Updated: 2025/11/30 21:22:35 by mzdrodow         ###   ########.fr       */
+/*   Updated: 2025/11/30 22:04:55 by mzdrodow         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,10 +38,10 @@ void	signal_handler(int sig, siginfo_t *info, void *context)
 		g_buffer.size = 0;
 	}
 
-	if(shown_start_message == 0) {
-		ft_printf("started downloading.");
-		shown_start_message = 1;
-	}
+	// if(shown_start_message == 0) {
+	// 	ft_printf("started downloading.");
+	// 	shown_start_message = 1;
+	// }
 
 	kill(client_pid, SIGUSR1);
 }
