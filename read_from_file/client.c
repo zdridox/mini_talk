@@ -6,13 +6,16 @@
 /*   By: mzdrodow <mzdrodow@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/28 20:28:07 by mzdrodow          #+#    #+#             */
-/*   Updated: 2025/11/29 02:45:58 by mzdrodow         ###   ########.fr       */
+/*   Updated: 2025/11/30 21:42:45 by mzdrodow         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "mini_talk.h"
+#include <sys/time.h>
+#include <stdio.h>
 
 t_data	*g_data;
+struct timeval t1, t2;
 
 char	*progress_bar(void)
 {
@@ -41,7 +44,7 @@ void	free_data(void)
 	char	*bar;
 
 	bar = progress_bar();
-	ft_printf("\r%d%% %s | bytes: %d/%d", (g_data->bytes_send * 100)
+	ft_printf("\r%d%% %s | bytes: %d/%d\n", (g_data->bytes_send * 100)
 		/ g_data->bytes_size, bar, g_data->bytes_send, g_data->bytes_size);
 	free(bar);
 	free(g_data->message);
@@ -77,9 +80,10 @@ void	signal_handler(int sig)
 
 
 void read_file(char *file) {
-	char buffer[1024];
+	char buffer[1025];
 	int size = 0;
 	int readed;
+	int written = 0;
 	int fd = open(file, O_RDONLY);
 	while((readed = read(fd, buffer, 1024)) > 0)
 		size += readed;
@@ -87,7 +91,10 @@ void read_file(char *file) {
 	g_data->message = malloc(size + 1);
 	fd = open(file, O_RDONLY);
 	while((readed = read(fd, buffer, 1024)) > 0)
-		ft_strlcat(g_data->message, buffer, size);
+	{
+		ft_memcpy(&g_data->message[written], buffer, readed);
+		written += readed;
+	}	
 	g_data->message[size] = '\0';
 	close(fd);
 }
@@ -108,6 +115,7 @@ int	main(int argc, char **argv)
 	g_data->finished = 0;
 	g_data->buffer_size = 0;
 	signal(SIGUSR1, signal_handler);
+	gettimeofday(&t1, NULL);
 	send_bit();
 	while (1)
 	{
@@ -116,7 +124,11 @@ int	main(int argc, char **argv)
 			/ g_data->bytes_size, bar, g_data->bytes_send, g_data->bytes_size);
 		free(bar);
 		if (g_data->finished)
+		{
+			gettimeofday(&t2, NULL);
+			printf("this upload took: %.3fs", (t2.tv_sec - t1.tv_sec) + (t2.tv_usec - t1.tv_usec) / 1e6);
 			free_data();
+		}
 	}
 	return (0);
 }
