@@ -12,11 +12,11 @@
 
 #include "mini_talk.h"
 
-t_buffer	g_buffer;
+t_buffer g_buffer;
 
-void	signal_handler(int sig, siginfo_t *info, void *context)
+void signal_handler(int sig, siginfo_t *info, void *context)
 {
-	int	client_pid;
+	int client_pid;
 
 	(void)context;
 	client_pid = info->si_pid;
@@ -38,10 +38,10 @@ void	signal_handler(int sig, siginfo_t *info, void *context)
 	kill(client_pid, SIGUSR1);
 }
 
-int	main(void)
+int main(int argc, char **argv)
 {
-	int					pid;
-	struct sigaction	sa;
+	int pid;
+	struct sigaction sa;
 
 	g_buffer.buffer = 0;
 	g_buffer.size = 0;
